@@ -3,6 +3,8 @@ Handheld Readout Device(HRD) for Sensors.
 
 An open project, to discuss and solve, with EFM32G230(Silabs).
 
+OEM-Boards are available.
+
 ![My image](https://github.com/peterloes/HRD_SENSOR/blob/main/Getting_Started_Tutorial/1_Electronic_board.jpg)
 
 First entry Sensor SHT31-D (Sensirion)
