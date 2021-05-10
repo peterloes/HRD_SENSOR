@@ -20,6 +20,14 @@ Revision History:
 
 /*=============================== Definitions ================================*/
 
+    /*!@brief Sensor Controller Types (bit mask) */
+typedef enum
+{
+    BCT_UNKNOWN  = 0x00,	//!< Sensor Controller Type not known yet
+    BCT_SHT3XL   = 0x01,	//!< Sensirion Controller (2015)
+    BCT_SHT3XH   = 0x02,	//!< Sensirion Controller (2015)
+} BC_TYPE;
+
 /*!@brief SBS Commands
  *
  * Here follow the register addresses of the battery controller as used for the
@@ -71,6 +79,10 @@ typedef enum
     END_SBS_CMD,			//!< End of SBS Command Definitions
 } SBS_CMD;
 
+
+    /*!@brief Macro to extract address from @ref SBS_CMD enum. */
+#define SBS_CMD_ADDR(cmd)	((cmd) & 0xFF)
+
     /*!@brief Macro to extract size from @ref SBS_CMD enum. */
 #define SBS_CMD_SIZE(cmd)	((cmd >> 8) & 0xFF)
 
@@ -98,14 +110,30 @@ typedef enum
      */
 #define i2cInvalidParameter		-11
 
+
+/*================================ Global Data ===============================*/
+
+    /* I2C Device Address of the Sensor Controller */
+extern uint8_t g_SensorCtrlAddr;
+
+    /* Sensor Controller Type */
+extern BC_TYPE g_SensorCtrlType;
+
+    /* ASCII Name of the Sensor Controller, or "" if no one found */
+extern const char *g_SensorCtrlName;
+
 /*================================ Prototypes ================================*/
 
     /* Initialize Sensor Monitor module */
 void	 SensorMonInit (void);
 
+    /* Probe for Controller Type */
+void	 SensorCtrlProbe (void);
+
+
     /* Register read functions */
-int	 SensorRegReadWord  (SBS_CMD cmd);
-int	 SensorRegReadBlock (SBS_CMD cmd, uint8_t *pBuf, size_t bufSize);
+int	 SensorRegReadValue (SBS_CMD cmd, uint32_t *pValue);
+int	 SensorRegReadBlock (SBS_CMD cmd, uint8_t  *pBuf, size_t bufSize);
 uint32_t ReadVdd (void);
 
-#endif /* __INC_BatteryMon_h */
+#endif /* __INC_SensorMon_h */
