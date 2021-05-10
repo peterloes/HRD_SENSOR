@@ -49,6 +49,8 @@
  *
  ****************************************************************************//*
 Revision History:
+2020-01-13,rage	Calculate the LCD contrast depending on the CR2032 voltage.
+		ConsolePrintf() allows formated output to the serial console.
 2016-11-22,rage	Added DMA Channel Assignment for LEUART support.
 		Changed l_ExtIntCfg for new version of ExtInt module.
 		Initialize LEUART.
@@ -147,7 +149,6 @@ Revision History:
 
 extern char const prjVersion[];
 extern char const prjDate[];
-extern char const prjTime[];
 
 
 /*! @brief Global DMA Control Block.
@@ -257,8 +258,8 @@ static const LCD_FIELD l_LCD_Field[LCD_FIELD_ID_CNT] =
     {  0,  0,	16	},	//!< 2: LCD_LINE1_TEXT
     {  0,  1,	16	},	//!< 3: LCD_LINE2_TEXT
     {  0,  0,	16	},	//!< 4: LCD_ITEM_DESC
-    {  10,  0,	6	},	//!< 5: LCD_ITEM_ADDR
-    {  0,  1,	16	},	//!< 6: LCD_ITEM_DATA
+    {  0,  1,	16	},	//!< 5: LCD_ITEM_ADDR
+    {  5,  1,	11	},	//!< 6: LCD_ITEM_DATA
     {  0,  0,	16	},	//!< 7: LCD_CLOCK (no RTC, just display the uptime)
 };
 
@@ -274,7 +275,7 @@ static const LCD_FIELD l_LCD_Field[LCD_FIELD_ID_CNT] =
      */
 static const ITEM l_Item[] =
 {  // [1234567890123456]    Cmd				Frmt
-    { ">>> SHT31-D <<<",      SBS_NONE,			FRMT_FW_VERSION	},
+    { ">>> SHT31-D <<<",    SBS_NONE,			FRMT_FW_VERSION	},
     { "Supply Battery",	    SBS_NONE,			FRMT_CR2032_BAT	},
     { "STATUS", 	    SBS_READ_STATUS,	        FRMT_HEX	},
 };
@@ -296,6 +297,9 @@ int main( void )
 
     /* Set up clocks */
     cmuSetup();
+    
+     /* Enable FET to power the device independent from the Power Button */
+    PowerUp();
 
     /* Init Low Energy UART with 9600bd (this is the maximum) */
     drvLEUART_Init (9600);
@@ -304,7 +308,7 @@ int main( void )
     dbgInit();
 
     /* Output version string to SWO or LEUART */
-    DBG_PUTS("\n***** SHT31-D V");
+    DBG_PUTS("\n***** SHT31X-D V");
     DBG_PUTS(prjVersion);
     DBG_PUTS(" ");
     DBG_PUTS(prjDate);
@@ -331,9 +335,16 @@ int main( void )
     /* Verify element count */
     EFM_ASSERT(ELEM_CNT(l_LCD_Field) == LCD_FIELD_ID_CNT);
 
+      /*
+     * Set Contrast of LC-Display.  This depends on the CR2032 Battery Voltage:
+     * 2.9V -> 30, 2.6V -> 45, i.e. 5 digits per 100mV, 1 digit per 20mV
+     * Contrast calculation must be done before initializing the LCD!
+     */
+    LCD_SetContrast((3500 - ReadVdd()) / 20);
+    
     /* Initialize display - show firmware version */
     DisplayInit (l_LCD_Field, l_Item, ITEM_CNT);
-    LCD_Printf (LCD_LINE1_TEXT, ">>> SHT31 <<<");
+    LCD_Printf (LCD_LINE1_TEXT, ">>> SHT31X-D <<<");
     LCD_Printf (LCD_LINE2_TEXT, "V%s %s", prjVersion, prjDate);
 
     /* Initialize Sensor Monitor */
@@ -410,4 +421,28 @@ static void cmuSetup(void)
 
     /* Enable clock to GPIO */
     CMU_ClockEnable(cmuClock_GPIO, true);
+}
+
+/***************************************************************************//**
+ *
+ * @brief	Print string to serial console
+ *
+ * This routine is used to print text to the serial console, i.e. LEUART.
+ *
+ * @param[in] frmt
+ *	Format string of the text to print - same as for printf().
+ *
+ * @see		drvLEUART_puts()
+ *
+ ******************************************************************************/
+void ConsolePrintf (const char *frmt, ...)
+{
+char	 buffer[120];
+va_list	 args;
+
+
+    va_start (args, frmt);
+    vsprintf (buffer, frmt, args);
+    drvLEUART_puts (buffer);
+    va_end (args);
 }
