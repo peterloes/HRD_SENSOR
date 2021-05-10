@@ -1,7 +1,11 @@
 # HRD_SENSOR
 Handheld Readout Device(HRD) for Sensors. 
 
-An open project, to discuss and solve, with EFM32G230(Silabs).
+An open source project, to discuss and solve, with EFM32G230(Silabs).
+
+Firmware working process not finished.
+
+Firmware not reviewed.
 
 OEM-Boards are available.
 
