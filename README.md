@@ -9,6 +9,8 @@ Firmware not reviewed.
 
 OEM-Boards are available.
 
+Similar finished project: https://github.com/peterloes/HRD
+
 ![My image](https://github.com/peterloes/HRD_SENSOR/blob/main/Getting_Started_Tutorial/1_Electronic_board.jpg)
 
 First entry Sensor SHT31-D (Sensirion)
