@@ -63,6 +63,7 @@ Revision History:
 #include "AlarmClock.h"		// msDelay()
 #include "SensorMon.h"
 #include "Display.h"
+   
 
 /*=============================== Definitions ================================*/
 
@@ -91,7 +92,7 @@ Revision History:
     /*!@brief Structure to hold Information about a Sensor Controller */
 typedef struct
 {
-    uint8_t	 addr;		//!< SMBus address of the sesnor controller
+    uint8_t	 addr;		//!< SMBus address of the sensor controller
     BC_TYPE	 type;		//!< Corresponding controller type
     const char	*name;		//!< ASCII name of the controller
 } BC_INFO;
@@ -120,11 +121,10 @@ const char *g_SensorCtrlName;
     /*!@brief Probe List of supported Battery Controllers */
 static const BC_INFO l_ProbeList[] =
 {  //  addr	type		name (maximum 10 characters!)
-    {  0x44,	BCT_SHT3XL,	"SHT31-D LOW"	},
-    {  0x45,	BCT_SHT3XH,	"SHT31-D HIGH",	},
-    {  0x00,	BCT_UNKNOWN,	""		}	// End of the list
+    {  0x44,	BCT_SHT3XL,	"SHT31-D L"	},
+    {  0x00,	BCT_UNKNOWN,	""		}	// End of the list};
 };
-
+    
     /* Defining the SMBus initialization data */
 static I2C_Init_TypeDef smbInit =
 {
@@ -171,19 +171,19 @@ void	 SensorMonInit (void)
     /* Configure GPIOs for SMBus (I2C) functionality with Pull-Ups */
     GPIO_PinModeSet (SMB_GPIOPORT, SMB_SCL_PIN, gpioModeWiredAndPullUp, 1);
     GPIO_PinModeSet (SMB_GPIOPORT, SMB_SDA_PIN, gpioModeWiredAndPullUp, 1);
+       
+   /* Route SMB signals to the respective pins */
+   SMB_I2C_CTRL->ROUTE = I2C_ROUTE_SCLPEN | I2C_ROUTE_SDAPEN | SMB_LOC;
 
-    /* Route SMB signals to the respective pins */
-    SMB_I2C_CTRL->ROUTE = I2C_ROUTE_SCLPEN | I2C_ROUTE_SDAPEN | SMB_LOC;
-
-    /* Initialize SMBus (I2C) controller */
-    I2C_Init (SMB_I2C_CTRL, &smbInit);
-
+   /* Initialize SMBus (I2C) controller */
+   I2C_Init (SMB_I2C_CTRL, &smbInit);
+   
     /* Clear and enable SMBus interrupt */
     NVIC_ClearPendingIRQ (SMB_IRQn);
     NVIC_EnableIRQ (SMB_IRQn);
 }
 
-
+    
 /***************************************************************************//**
  *
  * @brief	De-Initialize the sensor monitoring module
@@ -240,8 +240,8 @@ int	status;
     for (i = 0;  l_ProbeList[i].addr != 0x00;  i++)
     {
 	g_SensorCtrlAddr = l_ProbeList[i].addr;	// try this address
-	status = SensorRegReadValue (SBS_READ_STATUS, NULL);
-	if (status >= 0)
+   	status = SensorRegReadValue(SBS_READ_STATUS, NULL);
+        if (status >= 0)
 	{
 	    /* Response from controller - sensor found */
 	    break;
@@ -258,18 +258,18 @@ int	status;
     g_SensorCtrlName = l_ProbeList[i].name;
     g_SensorCtrlType = l_ProbeList[i].type;
 
-#if 1
+#if 0
     /*
      * RAGE WORKAROUND: There may be some Sensor Packs with new 
      * controller out in the field, that use I2C-bus address 0x44.  These
      * would be detected as "SHT31X-D LOW" devices, which is wrong.
      * Therefore this workaround probes for register SBS_READ_STATUS
-     * (0xF32D) which only exists in the SHT31X-D controller.
+     * (0xF32D) which (only) exists in the SHT31X-D controller.
      */
-    status = SensorRegReadValue (SBS_READ_STATUS, NULL);
+    status = SensorRegReadValue(SBS_READ_STATUS, NULL);
     if (status >= 0)
     {
-	/* Register exists - must be TI controller */
+	/* Register exists - must be Sensor controller */
 	g_SensorCtrlName = l_ProbeList[1].name;
 	g_SensorCtrlType = l_ProbeList[1].type;
     }
@@ -395,7 +395,7 @@ int	 i;
 
 	*pValue = value;
     }
-
+ 
     return status;
 }
 
@@ -429,7 +429,7 @@ int	 i;
 int	SensorRegReadBlock (SBS_CMD cmd, uint8_t *pBuf, size_t rdCnt)
 {
 I2C_TransferSeq_TypeDef smbXfer;	// SMBus transfer data
-uint8_t addrBuf[1];			// buffer for device address
+uint8_t addrBuf[2];			// buffer for command address
 
 
     /* Check parameters */
@@ -437,17 +437,19 @@ uint8_t addrBuf[1];			// buffer for device address
     EFM_ASSERT (pBuf != NULL);		// buffer address
     EFM_ASSERT (rdCnt >= SBS_CMD_SIZE(cmd));	// buffer size
 
-    if (rdCnt < SBS_CMD_SIZE(cmd))	// if EFM_ASSERT() is empty
+   if (rdCnt < SBS_CMD_SIZE(cmd))	// if EFM_ASSERT() is empty
 	return i2cInvalidParameter;
 
     /* Set up SMBus transfer S-Wr-Cmd-Sr-Rd-data1-P */
-    smbXfer.addr  = g_SensorCtrlAddr;	// I2C address of the Sensor Controller
+    smbXfer.addr  = g_SensorCtrlAddr;	 // I2C address of the Sensor
     smbXfer.flags = I2C_FLAG_WRITE_READ; // write address, then read data
-    smbXfer.buf[0].data = addrBuf;	// first buffer (data to write)
-    addrBuf[0] = cmd;			// register address (strip higher bits)
-    smbXfer.buf[0].len  = 1;		// 1 byte for command
-    smbXfer.buf[1].data = pBuf;		// second buffer to store bytes read
-    smbXfer.buf[1].len  = rdCnt;	// number of bytes to read
+    smbXfer.buf[0].data = addrBuf;       // first buffer (data to write)
+    //addrBuf[0] = cmd;			// register address (strip higher bits)
+    addrBuf[0] = cmd >> 8;		 // write upper 8 bits of the command
+    addrBuf[1] = cmd & 0xFF;		 // write lower 8 bits of the command
+    smbXfer.buf[0].len  = 2;		 // 2 bytes for command
+    smbXfer.buf[1].data = pBuf;		 // second buffer to store bytes read
+    smbXfer.buf[1].len  = rdCnt;	 // number of bytes to read
 
     /* Start I2C Transfer */
     SMB_Status = I2C_TransferInit (SMB_I2C_CTRL, &smbXfer);
@@ -470,8 +472,9 @@ uint8_t addrBuf[1];			// buffer for device address
 	    SMB_Status = (I2C_TransferReturn_TypeDef)i2cTransferTimeout;
 	}
     }
-
-    /* Return final status */
+    
+   
+     /* Return final status */
     return SMB_Status;
 }
 
