@@ -23,22 +23,22 @@ Revision History:
     /*!@brief Sensor Controller Types (bit mask) */
 typedef enum
 {
-    BCT_UNKNOWN  = 0x00,	//!< Sensor Controller Type not known yet
-    BCT_SHT3XL   = 0x01,	//!< Sensirion Controller (2015)
-    BCT_TI       = 0x02,	//!< Texas Instruments Controller (2019)
+    BCT_UNKNOWN    = 0x00,	//!< Sensor Controller Type not known yet
+    BCT_SHT3X_DFLT = 0x01,	//!< Sensirion Controller default(2015)
+    BCT_SHT3X_ALT  = 0x02,	//!< Sensirion Controller (2015)
 } BC_TYPE;
 
 /*!@brief SBS Commands
  *
  * These are the defines for the registers of the sensor controller.  Each
  * define contains the following bit fields:
- * - Bit 22:20 specify the controller type where the define belongs to. Bit 20
- *   (0x100000) represents the Sensor SHT3XL controller,
- *   while bit 21 (0x200000) specifies the Sensor SHT3XH controller.
+ * - Bit 26:24 specify the controller type where the define belongs to. Bit 24
+ *   (0x1000000) represents the Sensor SHT3X-DFLT controller,
+ *   while bit 25 (0x200000) specifies the Sensor SHT3X-ALT controller.
  *   If both bits are set (0x300000), the register exists in both controller
  *   types.  Bit 20 is used if no controller is connected to
  *   identify the remaining valid entries (where SBS_NONE is set).
- * - Bit 19:16 contains the number of bytes to read.  For 8, 16, or 32 bit values
+ * - Bit 23:16 contains the number of bytes to read.  For 8, 16, or 32 bit values
  *   SensorRegReadValue() is called, while for more than 4 bytes function
  *   SensorRegReadBlock() will be used (block command).
  * - Bit 15:0 of the enum contains the address as used for the SBS commands sent
@@ -57,8 +57,6 @@ typedef enum
 typedef enum
 {
     SBS_NONE = (-1),		         //!< (-1) No Command / Address
-    SBS_ManufacturerAccess                  = 0x3020000,  //!< 0x00 ManufacturerAccess (legacy)
-    SBS_TurboPower	 = 0x20259,	//!< 0x59 TI Word: in [cW]
     SBS_REPEATABILITY_CLOCK_HIGH_ENABLED    = 0x3002C06,  //!< 0X2C06 enabled
     SBS_REPEATABILITY_CLOCK_MEDIUM_ENABLED  = 0x3002C0D,  //!< 0X2C0D enabled
     SBS_REPEATABILITY_CLOCK_LOW_ENABLED     = 0x3002C10,  //!< 0X2C10 enabled
@@ -80,8 +78,7 @@ typedef enum
     SBS_REPEATABILITY_CLOCK_MPS_10_HIGH     = 0x3002737,  //!< 0X2737 10 mps
     SBS_REPEATABILITY_CLOCK_MPS_10_MEDIUM   = 0x3002721,  //!< 0X2721 10 mps
     SBS_REPEATABILITY_CLOCK_MPS_10_LOW      = 0x300272A,  //!< 0X272A 10 mps
-    SBS_READ_SERIAL_NUMBER                  = 0x3023780,  //!< ???0x3780
-    //SBS_NO_SLEEP = 0x303E,                  //!< ???
+    SBS_READ_SERIAL_NUMBER    = 0x3023780,  //!< 0x3780 Serial Number
     SBS_FETCH_DATA            = 0x302E000,  //!< 0xE000 Fetch Data
     SBS_ART_MEASUREMENT       = 0x3022B32,  //!< 0x2B32 ART Periodic Measurement
     SBS_BREAK                 = 0x3003093,  //!< 0x3093 Break

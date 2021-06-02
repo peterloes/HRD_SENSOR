@@ -114,7 +114,7 @@ typedef void	(* DISP_NEXT_FCT)(int userParm);
 typedef enum
 {
     FRMT_FW_VERSION,	//!<  0: Special ID to show firmware version and date
-    FRMT_BAT_CTRL,	//!<  1: Battery controller SMBus address and type
+    FRMT_SENS_CTRL,	//!<  1: Sensor controller SMBus address and type
     FRMT_CR2032_BAT,	//!<  2: Voltage of local CR2032 supply battery
     FRMT_STRING,	//!<  3: 0-terminated string
     FRMT_HEX,		//!<  4: H1,2,3,4 Hexadecimal data representation
@@ -141,7 +141,7 @@ typedef enum
 typedef struct
 {
     const char	*pDesc;		//!< Description to be displayed (max. 16 char)
-    SBS_CMD	 Cmd;		//!< Register to read from Battery Controller
+    SBS_CMD	 Cmd;		//!< Register to read from Sensor Controller
     FRMT_TYPE	 Frmt;		//!< Format to use for value representation
 } ITEM;
 

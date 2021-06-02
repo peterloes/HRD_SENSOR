@@ -25,7 +25,7 @@ Revision History:
 		DisplaySelectItem() directly selects the specified item to be
 		displayed.  It is used to show the battery controller type.
 		ItemDataString: Increased buffer sizes, implemented new format
-		types FRMT_BAT_CTRL and FRMT_HEXDUMP.  FRMT_MILLIAMP outputs a
+		types FRMT_SENS_CTRL and FRMT_HEXDUMP.  FRMT_MILLIAMP outputs a
 		signed value now.  FRMT_HEX supports 8, 16, 24 and 32bit values.
 2016-11-22,rage	Asserting Power-Key returns to the first item to be displayed.
 		Calculate temperature and manufacturing date from raw values.
@@ -214,15 +214,15 @@ int	bitMaskCtrlType;
     /*
      * Build bit mask to detect items which are applicable for the current
      * controller type:
-     * 0x08000 - BCT_UNKNOWN (0x00)
-     * 0x10000 - BCT_SHT3XL  (0x01)
-     * 0x20000 - BCT_SHT3XH  (0x02)
+     * 0x0800000 - BCT_UNKNOWN (0x00)
+     * 0x1000000 - BCT_SHT3X_DFLT (0x01)
+     * 0x2000000 - BCT_SHT3X_ALT  (0x02)
      *
      * Note: Items with Cmd set to SBS_NONE (-1, i.e. all bits set!) will be
      *       displayed in any case.
      * See also BC_TYPE and SBS_CMD.
      */
-    bitMaskCtrlType = (0x8000 << g_SensorCtrlType);
+    bitMaskCtrlType = (0x800000 << g_SensorCtrlType);
     EFM_ASSERT(bitMaskCtrlType != 0);
 
     switch (keycode)
@@ -491,7 +491,7 @@ const char	*pStr;
 
 	    case LCD_ITEM_ADDR:		// display item register address
 		if (l_pItemList[l_ItemIdx].Cmd != SBS_NONE)
-		    LCD_Printf (id, "[%02X]", l_pItemList[l_ItemIdx].Cmd & 0xFF);
+		    LCD_Printf (id, "[%02X]", l_pItemList[l_ItemIdx].Cmd & 0xFFFF);
 		break;
 
 	    case LCD_ITEM_DATA:		// display item register data
@@ -531,7 +531,7 @@ const char	*pStr;
  * @brief	Item Data String
  *
  * This routine returns a formatted data string of the specified item data.
- * It uses BatteryRegReadWord() and BatteryRegReadBlock() to read the data
+ * It uses SensorRegReadWord() and SensorRegReadBlock() to read the data
  * directly from the battery controller.
  *
  * @param[in] pItem
@@ -597,7 +597,7 @@ int		 d, h, m;	// FRMT_DURATION: days, hours, minutes
 	    sprintf (strBuf, "V%s %s", prjVersion, prjDate);
 	    break;
 
-	case FRMT_BAT_CTRL:	// Battery controller SMBus address and type
+	case FRMT_SENS_CTRL:	// Battery controller SMBus address and type
 	    if (g_SensorCtrlAddr == 0)
 		strcpy (strBuf, "N O T  F O U N D");
 	    else

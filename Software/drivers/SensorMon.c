@@ -118,11 +118,12 @@ const char *g_SensorCtrlName;
 
 /*================================ Local Data ================================*/
 
-    /*!@brief Probe List of supported Battery Controllers */
+    /*!@brief Probe List of supported Sensor Controllers */
 static const BC_INFO l_ProbeList[] =
 {  //  addr	type		name (maximum 10 characters!)
-    {  0x44,	BCT_SHT3XL,	"SHT31-D L"	},
-    {  0x00,	BCT_UNKNOWN,	""		}	// End of the list};
+    {  0x88,	BCT_SHT3X_DFLT,	"SHT3X-DFLT"	},  // 0x44 Address 7 MSBs 0x88
+    {  0x8A,	BCT_SHT3X_ALT,	"SHT3X-ALT",	},  // 0x45 Address 7 MSBs 0x8A
+    {  0x00,	BCT_UNKNOWN,	""		}   // End of the list};
 };
     
     /* Defining the SMBus initialization data */
@@ -224,8 +225,8 @@ void	 SensorMonDeinit (void)
  * This routine probes the type of sensor controller.  This is done by checking
  * dedicated I2C-bus addresses on the SMBus.  The following addresses and their
  * corresponding controller type are supported:
- * - 0x44 in case of SHT31X-D LOW, and
- * - 0x45 for the SHT31X-D HIGH.
+ * - 0x88 MSBs (0x44) in case of SHT3X-ADDR-DFLT and
+ * - 0x8A MSBs (0x45) for the SHT3X-ADDR-ALT.
  * The address is stored in @ref g_SensorCtrlAddr, its ASCII name in @ref
  * g_SensorCtrlName and the controller type is stored as bit definition
  * @ref BC_TYPE in @ref g_SensorCtrlType.
@@ -240,7 +241,7 @@ int	status;
     for (i = 0;  l_ProbeList[i].addr != 0x00;  i++)
     {
 	g_SensorCtrlAddr = l_ProbeList[i].addr;	// try this address
-   	status = SensorRegReadValue(SBS_READ_STATUS, NULL);
+   	status = SensorRegReadValue(SBS_READ_SERIAL_NUMBER, NULL);
         if (status >= 0)
 	{
 	    /* Response from controller - sensor found */
@@ -262,9 +263,9 @@ int	status;
     /*
      * RAGE WORKAROUND: There may be some Sensor Packs with new 
      * controller out in the field, that use I2C-bus address 0x44.  These
-     * would be detected as "SHT31X-D LOW" devices, which is wrong.
+     * would be detected as "SHT3X-ADDR-DFLT" devices, which is wrong.
      * Therefore this workaround probes for register SBS_READ_STATUS
-     * (0xF32D) which (only) exists in the SHT31X-D controller.
+     * (0xF32D) which (only) exists in the SHT3X-D controller.
      */
     status = SensorRegReadValue(SBS_READ_STATUS, NULL);
     if (status >= 0)
@@ -432,6 +433,7 @@ I2C_TransferSeq_TypeDef smbXfer;	// SMBus transfer data
 uint8_t addrBuf[2];			// buffer for command address
 
 
+
     /* Check parameters */
     EFM_ASSERT (SBS_CMD_SIZE(cmd) != 0);// size field must not be 0
     EFM_ASSERT (pBuf != NULL);		// buffer address
@@ -441,12 +443,11 @@ uint8_t addrBuf[2];			// buffer for command address
 	return i2cInvalidParameter;
 
     /* Set up SMBus transfer S-Wr-Cmd-Sr-Rd-data1-P */
-    smbXfer.addr  = g_SensorCtrlAddr;	 // I2C address of the Sensor
-    smbXfer.flags = I2C_FLAG_WRITE_READ; // write address, then read data
-    smbXfer.buf[0].data = addrBuf;       // first buffer (data to write)
-    //addrBuf[0] = cmd;			// register address (strip higher bits)
-    addrBuf[0] = cmd >> 8;		 // write upper 8 bits of the command
-    addrBuf[1] = cmd & 0xFF;		 // write lower 8 bits of the command
+    smbXfer.addr  = g_SensorCtrlAddr; // I2C address of the Sensor
+    smbXfer.flags = I2C_FLAG_WRITE_READ;    // write address, then read data
+    smbXfer.buf[0].data = addrBuf;    // first buffer (data to write)
+    addrBuf[0] = cmd >> 8;        // register address (high byte)
+    addrBuf[1] = cmd & 0xFF;      // register address (low byte)
     smbXfer.buf[0].len  = 2;		 // 2 bytes for command
     smbXfer.buf[1].data = pBuf;		 // second buffer to store bytes read
     smbXfer.buf[1].len  = rdCnt;	 // number of bytes to read
