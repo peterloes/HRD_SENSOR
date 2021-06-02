@@ -20,7 +20,7 @@ Power management for the LC-Display.
 
 Display will be scrolled (11 digits).
 
-HRD can be connected to external devices like personal computers or smartphones to transfer and store the extracted technical data.
+HRD can be connected to external devices like personal computers to transfer and store the extracted technical data.
 
 Manufacture:
 
