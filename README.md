@@ -24,10 +24,6 @@ Manufacture:
 
 https://github.com/peterloes/HRD_SENSOR/blob/master/Getting_Started_Tutorial/3_Supplier.txt
 
-Optional Firmware components:
-
-https://github.com/peterloes/HRD
-
 The standalone HRD features EFM32 ...the world´s most energy friendly microcontrollers
 
 ARM Cortex-M3 EFM32G230F128
