@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file
- * @brief	HRD Sensor (SHT31-D)
- * @author	Petetr Loes
+ * @brief	HRD Sensor (SHT3X-DIS)
+ * @author	Peter Loes
  * @version	2021-05-03
  *
  * This application consists of the following modules:
@@ -259,7 +259,7 @@ static const LCD_FIELD l_LCD_Field[LCD_FIELD_ID_CNT] =
     {  0,  1,	16	},	//!< 3: LCD_LINE2_TEXT
     {  0,  0,	16	},	//!< 4: LCD_ITEM_DESC
     {  0,  1,	16	},	//!< 5: LCD_ITEM_ADDR
-    {  5,  1,	11	},	//!< 6: LCD_ITEM_DATA
+    {  7,  1,	 9	},	//!< 6: LCD_ITEM_DATA
     {  0,  0,	16	},	//!< 7: LCD_CLOCK (no RTC, just display the uptime)
 };
 
@@ -275,9 +275,11 @@ static const LCD_FIELD l_LCD_Field[LCD_FIELD_ID_CNT] =
      */
 static const ITEM l_Item[] =
 {  // [1234567890123456]    Cmd				Frmt
-    { ">>> SHT31-D <<<",    SBS_NONE,			FRMT_FW_VERSION	},
+    { ">>> SHT3X-D <<<",    SBS_NONE,			FRMT_FW_VERSION	},
+    { "Sensor at SMBus",    SBS_NONE,           	FRMT_SENS_CTRL	},
     { "Supply Battery",	    SBS_NONE,			FRMT_CR2032_BAT	},
-    { "STATUS", 	    SBS_READ_STATUS,	        FRMT_HEX	},
+    { "Serial Number",	    SBS_READ_SERIAL_NUMBER,	FRMT_HEX	},
+    { "Status",  	    SBS_READ_STATUS,  	        FRMT_HEX	},
 };
 
 #define ITEM_CNT	ELEM_CNT(l_Item)
@@ -308,7 +310,7 @@ int main( void )
     dbgInit();
 
     /* Output version string to SWO or LEUART */
-    DBG_PUTS("\n***** SHT31X-D V");
+    DBG_PUTS("\n***** SHT3X-D V");
     DBG_PUTS(prjVersion);
     DBG_PUTS(" ");
     DBG_PUTS(prjDate);
@@ -344,13 +346,13 @@ int main( void )
     
     /* Initialize display - show firmware version */
     DisplayInit (l_LCD_Field, l_Item, ITEM_CNT);
-    LCD_Printf (LCD_LINE1_TEXT, ">>> SHT31X-D <<<");
+    LCD_Printf (LCD_LINE1_TEXT, ">>> SHT3X-D <<<");
     LCD_Printf (LCD_LINE2_TEXT, "V%s %s", prjVersion, prjDate);
 
     /* Initialize Sensor Monitor */
     SensorMonInit();
-
-    /* Enable all other External Interrupts */
+    
+     /* Enable all other External Interrupts */
     ExtIntEnableAll();
 
 
