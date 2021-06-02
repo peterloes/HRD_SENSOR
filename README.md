@@ -1,35 +1,33 @@
-# HRD_SENSOR
-Handheld Readout Device(HRD) for Sensors. EFM32G230(Silabs).
+﻿# A Handheld Readout Device(HRD) for Sensors
+Monitoring Sensors Quality.
 
-Hardware_EagleFiles
+A standalone HRD to enable long-term diagnostic observations and
+documentation of sensors quality.
 
-https://github.com/peterloes/HRD/tree/master/Hardware_EagleFiles
+Supported:
 
-Schematics
+- SENSIRION SHT3X-DIS
 
-https://github.com/peterloes/HRD/tree/master/Schematics
-
-
-Firmware working process not finished.
-
-Firmware not reviewed.
-
-OEM-Boards are available.
-
-Similar finished project: https://github.com/peterloes/HRD
+Firmware working process not finished. Firmware not reviewed.
 
 ![My image](https://github.com/peterloes/HRD_SENSOR/blob/main/Getting_Started_Tutorial/1_Electronic_board.jpg)
+
+Battery controller probing requests. 0x44=Sensirion
+
+Actual Current is signed.
+
+Power management for the LC-Display.
+
+Display will be scrolled (11 digits).
 
 Manufacture:
 
 https://github.com/peterloes/HRD_SENSOR/blob/master/Getting_Started_Tutorial/3_Supplier.txt
 
+Optional Firmware components:
+
+https://github.com/peterloes/HRD
+
 The standalone HRD features EFM32 ...the world´s most energy friendly microcontrollers
 
 ARM Cortex-M3 EFM32G230F128
-
-First entry Sensor SHT31-D (Sensirion)
-
-![My image](https://github.com/peterloes/HRD_SENSOR/blob/main/Getting_Started_Tutorial/2_Sensor_SHT31_D.jpg)
-
-
