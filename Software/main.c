@@ -280,6 +280,8 @@ static const ITEM l_Item[] =
     { "Supply Battery",	    SBS_NONE,			FRMT_CR2032_BAT	},
     { "Serial Number",	    SBS_READ_SERIAL_NUMBER,	FRMT_HEX	},
     { "Status",  	    SBS_READ_STATUS,  	        FRMT_HEX	},
+    { "Heater enabled",     SBS_HEATER_ENABLE,         FRMT_HEX        },
+    { "Heater disabled",    SBS_HEATER_DISABLE,         FRMT_HEX        },
 };
 
 #define ITEM_CNT	ELEM_CNT(l_Item)
