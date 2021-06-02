@@ -12,8 +12,6 @@ Supported:
 
 Battery controller probing requests. 0x44=Sensirion
 
-Actual Current is signed.
-
 Power management for the LC-Display.
 
 Display will be scrolled (11 digits).
