@@ -8,8 +8,6 @@ Supported:
 
 - SENSIRION SHT3X-DIS
 
-Firmware working process not finished. Firmware not reviewed.
-
 ![My image](https://github.com/peterloes/HRD_SENSOR/blob/main/Getting_Started_Tutorial/1_Electronic_board.jpg)
 
 Battery controller probing requests. 0x44=Sensirion
