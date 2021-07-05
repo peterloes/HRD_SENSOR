@@ -279,8 +279,16 @@ static const ITEM l_Item[] =
     { "Sensor at SMBus",    SBS_NONE,           	FRMT_SENS_CTRL	},
     { "Supply Battery",	    SBS_NONE,			FRMT_CR2032_BAT	},
     { "Serial Number",	    SBS_READ_SERIAL_NUMBER,	FRMT_HEX	},
+    { "Soft Reset",         SBS_SOFT_RESET,             FRMT_HEX        },
     { "Status",  	    SBS_READ_STATUS,  	        FRMT_HEX	},
-    { "Heater enabled",     SBS_HEATER_ENABLE,         FRMT_HEX        },
+    { "Clock Str. dis H",   SBS_REPEATABILITY_CLOCK_HIGH_DISABLED,   FRMT_HEX},
+    { "Clock Str. dis M",   SBS_REPEATABILITY_CLOCK_MEDIUM_DISABLED, FRMT_HEX},
+    { "Clock Str. dis L",   SBS_REPEATABILITY_CLOCK_LOW_DISABLED,    FRMT_HEX},
+    { "Measure mps2 M",     SBS_REPEATABILITY_CLOCK_MPS_2_MEDIUM,    FRMT_HEX},
+    { "Data T",             SBS_FETCH_DATA,             FRMT_TEMP       },
+    { "Data RH",            SBS_FETCH_DATA,             FRMT_RH         },
+    { "Break ",             SBS_BREAK,                  FRMT_HEX        },
+    { "Heater enabled",     SBS_HEATER_ENABLE,          FRMT_HEX        },
     { "Heater disabled",    SBS_HEATER_DISABLE,         FRMT_HEX        },
 };
 
