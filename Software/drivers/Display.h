@@ -130,7 +130,9 @@ typedef enum
     FRMT_MILLIAMPH,	//!< 14: U2 Capacity in [mAh]
     FRMT_MICROOHM,	//!< 15: Resistance in [uOhm]
     FRMT_DATE,		//!< 16: Date [15:9=Year|8:5=Month|4:0=Day]
-    FRMT_TEMP,		//!< 17: U2 Temperature [0.1°K]
+    FRMT_TEMP,		//!< 17: Temperature [°C]
+    FRMT_RH,		//!< 18: Relative Hunidity [%RH]
+    
     FRMT_TYPE_CNT	//!< Format Type Count
 } FRMT_TYPE;
 

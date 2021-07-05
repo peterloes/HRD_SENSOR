@@ -228,8 +228,8 @@ int	bitMaskCtrlType;
     switch (keycode)
     {
 	case KEYCODE_POWER_ASSERT:	// POWER was asserted
-	    if (! l_flgDisplayIsOn)
-		break;			// just use as wake-up if LCD is OFF
+ 	    if (! l_flgDisplayIsOn)
+        	break;			// just use as wake-up if LCD is OFF
 
 	    l_ItemIdx = 0;		// select item number 0, display version
 	    l_flgSensorCtrlProbe = true;	// first assertion, probe now
@@ -237,10 +237,10 @@ int	bitMaskCtrlType;
 
 	case KEYCODE_POWER_REPEAT:	// repeated POWER was asserted
 	    /* Note: l_flgPowerOff is set below */
-	    break;
+ 	    break;
 
 	case KEYCODE_NEXT_ASSERT:	// NEXT was asserted
-	    if (! l_flgDisplayIsOn)
+            if (! l_flgDisplayIsOn)
 		break;			// just use as wake-up if LCD is OFF
 
 	    /* no break */
@@ -272,7 +272,7 @@ int	bitMaskCtrlType;
 	    break;
 
 	case KEYCODE_POWER_RELEASE:	// POWER was released
-	case KEYCODE_PREV_RELEASE:	// PREV was released
+  	case KEYCODE_PREV_RELEASE:	// PREV was released
 	case KEYCODE_NEXT_RELEASE:	// NEXT was released
 	    /* (re-)start timers to switch display/device OFF after time */
 	    if (l_hdlLCD_Off != NONE)
@@ -289,7 +289,7 @@ int	bitMaskCtrlType;
 
     /* POWER_REPEAT should switch the device off (when button is released) */
     l_flgPowerOff = (keycode == KEYCODE_POWER_REPEAT ? true : false);
-
+  
     /* Limit the displayable range if no battery pack is connected */
     if (g_SensorCtrlAddr == 0x00  &&  l_ItemIdx > 2)
 	l_ItemIdx = 0;
@@ -601,7 +601,7 @@ int		 d, h, m;	// FRMT_DURATION: days, hours, minutes
 	    if (g_SensorCtrlAddr == 0)
 		strcpy (strBuf, "N O T  F O U N D");
 	    else
-		sprintf (strBuf, "0x%02X: %s", g_SensorCtrlAddr,
+		sprintf (strBuf, "0x%02X: %s", (g_SensorCtrlAddr >> 1),
 			 g_SensorCtrlName);
 	    break;
 
@@ -709,15 +709,29 @@ int		 d, h, m;	// FRMT_DURATION: days, hours, minutes
 		     (data >> 5) & 0xF, data & 0x1F);
 	    break;
 
-	case FRMT_TEMP:		// Temperature in 1/10[K], convert to [°C]
-            {
-            data -= 2732;	// subtract base of 273.16K
-	    int degC = data / 10;
-	    if (data < 0)
-		data = -data;
-	    sprintf (strBuf, "%d.%d C", degC, data % 10);
+	case FRMT_TEMP:		// Temperature convert to [°C]
+           {
+                /* The first and second byte contains the temperature.
+                *  The third byte contains the checksum. */
+               
+               // combine the two bytes to a 16-bit value
+               data = (dataBuf[0] << 8) | dataBuf[1];
+               float degC =  (175 * (float)data / 65535.0f) - 45.0f;
+               sprintf (strBuf, "%04.02f C", degC);
 	    }
           break;
+        case FRMT_RH:		// Relative Humidity, convert to [%RH]
+            {
+               /* The fourth and fifth byte contains the relative humidity.
+                * The sixth byte contains the checksum. */
+              
+               // combine the two bytes to a 16-bit value
+               data = (dataBuf[3] << 8) | dataBuf[4];
+               float rh = ((float)data / 65535.0f) * 100.0f;
+               sprintf (strBuf, "%04.02f %RH", rh);
+            }
+            break;
+                   
 
 	default:		// unsupported format
 	    return NULL;
