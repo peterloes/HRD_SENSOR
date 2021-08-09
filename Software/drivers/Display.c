@@ -601,7 +601,7 @@ int		 d, h, m;	// FRMT_DURATION: days, hours, minutes
 	    if (g_SensorCtrlAddr == 0)
 		strcpy (strBuf, "N O T  F O U N D");
 	    else
-		sprintf (strBuf, "0x%02X: %s", (g_SensorCtrlAddr >> 1),
+		sprintf (strBuf, "0x%02X: %s", g_SensorCtrlAddr,
 			 g_SensorCtrlName);
 	    break;
 
@@ -710,29 +710,31 @@ int		 d, h, m;	// FRMT_DURATION: days, hours, minutes
 	    break;
 
 	case FRMT_TEMP:		// Temperature convert to [°C]
-           {
-                /* The first and second byte contains the temperature.
-                *  The third byte contains the checksum. */
-               
+            {
+               /*
+	        * The first and second byte contains the temperature.
+                * The third byte contains the checksum
+                */
                // combine the two bytes to a 16-bit value
-               data = (dataBuf[0] << 8) | dataBuf[1];
-               float degC =  (175 * (float)data / 65535.0f) - 45.0f;
-               sprintf (strBuf, "%04.02f C", degC);
+              data = (dataBuf[0] << 8) | dataBuf[1];
+              float degC =  (175 * (float)data / 65535.0f) - 45.0f;
+              sprintf (strBuf, "%04.02f C", degC);
 	    }
           break;
         case FRMT_RH:		// Relative Humidity, convert to [%RH]
             {
-               /* The fourth and fifth byte contains the relative humidity.
-                * The sixth byte contains the checksum. */
-              
-               // combine the two bytes to a 16-bit value
+               /*
+	        * The fourth and fifth byte contains the relative humidity.
+                * The sixth byte contains the checksum.
+                */
+                // combine the two bytes to a 16-bit value
                data = (dataBuf[3] << 8) | dataBuf[4];
                float rh = ((float)data / 65535.0f) * 100.0f;
-               sprintf (strBuf, "%04.02f %RH", rh);
+               sprintf (strBuf, "%04.02f RH", rh);
             }
             break;
-                   
-
+            
+          
 	default:		// unsupported format
 	    return NULL;
 
