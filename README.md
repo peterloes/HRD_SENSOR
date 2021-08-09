@@ -4,7 +4,6 @@ Monitoring Sensors Quality.
 A standalone HRD to enable long-term diagnostic observations and
 documentation of sensors quality.
 
-Firmware not reviewed.
 
 Supported:
 
@@ -27,9 +26,10 @@ Manufacture:
 https://github.com/peterloes/HRD_SENSOR/blob/master/Getting_Started_Tutorial/3_Supplier.txt
 
 
-First Firmware reviewed: Handheld Readout Device(HRD) for Battery Management Systems.
+Similar project: Handheld Readout Device(HRD) for Battery Management Systems
 
 https://github.com/peterloes/HRD
+
 
 The standalone HRD features EFM32 ...the world´s most energy friendly microcontrollers
 
