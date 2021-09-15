@@ -31,6 +31,8 @@ Similar project: Handheld Readout Device(HRD) for Battery Management Systems
 https://github.com/peterloes/HRD
 
 
-The standalone HRD features EFM32 ...the world´s most energy friendly microcontrollers
+EXTENSION: 
 
-ARM Cortex-M3 EFM32G230F128
+Next generation of Data Logger for varied range support of Sensors.
+
+https://github.com/peterloes/Data_Logger
