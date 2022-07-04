@@ -33,6 +33,6 @@ https://github.com/peterloes/HRD
 
 EXTENSION: 
 
-Next generation of Data Logger for varied range support of Sensors.
+Next generation of data logger for varied range support of sensors.
 
 https://github.com/peterloes/Data_Logger
