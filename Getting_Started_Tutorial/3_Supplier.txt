@@ -13,5 +13,10 @@ www.top-print.eu
 
 
 
+FTDI Chip cable (3.5mm Audio Jack to USB)
+TTL-232R-3V3-AJ
+
+
+
 Docklight RS232 Terminal / RS232 Monitor
 https://docklight.de/information/
